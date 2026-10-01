@@ -113,9 +113,6 @@ export default function ChatWindow({
       try {
         const data = await GetconversationId(conversationId);
 
-
-        console.log("Conversation messages:", data);
-
         if (data?.success) {
           const formattedMessages = data.messages.map((item) => ({
             id: item._id,
