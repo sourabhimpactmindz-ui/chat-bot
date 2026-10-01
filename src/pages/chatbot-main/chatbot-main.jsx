@@ -37,9 +37,10 @@ export default function Chatbot() {
   }, [fetchConversations]);
 
   const select = (id) => {
-    setActive(id);
-    setOpen(false);
-  };
+  setActive(id);
+  setChatKey((k) => k + 1);  
+  setOpen(false);
+};
 
   const newChat = () => {
     setActive(null);
@@ -63,15 +64,15 @@ export default function Chatbot() {
       />
 
       <ChatWindow
-        key={`${active}-${chatKey}`}
-        title={activeTitle}
-        conversationId={active}
-        onMenu={() => setOpen(!open)}
-        onConversationCreated={(id) => {
-          setActive(id);
-          fetchConversations(); 
-        }}
-      />
+  key={chatKey}               
+  title={activeTitle}
+  conversationId={active}
+  onMenu={() => setOpen(!open)}
+  onConversationCreated={(id) => {
+    setActive(id);            
+    fetchConversations();
+  }}
+/>
     </div>
   );
 }

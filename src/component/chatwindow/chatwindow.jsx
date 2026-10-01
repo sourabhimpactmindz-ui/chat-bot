@@ -83,7 +83,9 @@ export default function ChatWindow({
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
-  const [menuId , setmenuId] = useState(null)
+  const [menuId , setmenuId] = useState(null);
+  const [loading , setLoading] = useState(false);
+  const skipFetchRef = useRef(false);
   const abortRef = useRef(null)
   const endRef = useRef(null);
 
@@ -104,14 +106,26 @@ export default function ChatWindow({
   }
 
   useEffect(() => {
+    if(skipFetchRef.current){
+      skipFetchRef.current = false;
+      return;
+    
+    }
+
+    let cancelled = false;
+
+
     const fetchMessages = async () => {
       if (!conversationId) {
         setMessages([]);
         return;
       }
 
+      setLoading(true);
+
       try {
         const data = await GetconversationId(conversationId);
+        if (cencelled) return;
 
         if (data?.success) {
           const formattedMessages = data.messages.map((item) => ({
@@ -128,27 +142,27 @@ export default function ChatWindow({
         } else {
           setMessages([]);
         }
-      } catch (error) {
+      }catch (error) {
+      if (!cancelled) {
         console.error("Failed to load messages:", error);
         setMessages([]);
       }
-    };
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+  };
 
-    fetchMessages();
-  }, [conversationId]);
-
-  
-  useEffect(() => {
-    endRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
-  }, [messages, typing]);
+  fetchMessages();
+  return () => { cancelled = true; };
+}, [conversationId]);
 
   const now = () =>
     new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
+
+
 
 const send = async () => {
   const text = input.trim();
@@ -181,6 +195,7 @@ const send = async () => {
 
       if (!conversationId && data.conversationid) {
         onConversationCreated?.(data.conversationid);
+        skipFetchRef.current = true;
       }
     } else {
       setMessages((prev) => [
@@ -249,11 +264,13 @@ const send = async () => {
 
       <section className="messages">
 
-        {messages.length === 0 && (
-          <div className="empty">
-            Ask anything to start a new conversation.
-          </div>
-        )}
+      {messages.length === 0 && !loading && !typing && (
+  <div className="empty">Ask anything to start a new conversation.</div>
+)}
+
+{loading && messages.length === 0 && (
+  <div className="empty">Loading chat...</div>
+)}
 
         {messages.map((m,i) => (
           m.role === "user" ? (
