@@ -64,13 +64,17 @@ export default function Chatbot() {
       />
 
       <ChatWindow
-  key={chatKey}               
+  key={chatKey}
   title={activeTitle}
   conversationId={active}
   onMenu={() => setOpen(!open)}
-  onConversationCreated={(id) => {
-    setActive(id);            
-    fetchConversations();
+  onConversationCreated={(id, convTitle) => {
+    setActive(id);
+    setConversations((prev) =>
+      prev.some((c) => c._id === id)
+        ? prev
+        : [{ _id: id, title: convTitle }, ...prev]   // sabse upar naya chat
+    );
   }}
 />
     </div>

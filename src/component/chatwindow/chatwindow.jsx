@@ -86,7 +86,7 @@ export default function ChatWindow({
       minute: "2-digit",
     });
 
-  // Textarea text ke hisaab se badhe (max 160px)
+ 
   useEffect(() => {
     const el = taRef.current;
     if (!el) return;
@@ -94,9 +94,9 @@ export default function ChatWindow({
     el.style.height = Math.min(el.scrollHeight, 160) + "px";
   }, [input]);
 
-  // Conversation change hone par purane messages load karo
+ 
   useEffect(() => {
-    // Naya chat abhi bana hai, messages screen par pehle se hain, fetch mat karo
+    
     if (skipFetchRef.current) {
       skipFetchRef.current = false;
       return;
@@ -147,7 +147,7 @@ export default function ChatWindow({
     };
   }, [conversationId]);
 
-  // Naya message aane par neeche scroll
+  
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
@@ -189,7 +189,8 @@ export default function ChatWindow({
         if (!conversationId && data.conversationid) {
           skipFetchRef.current = true; // pehle flag, phir parent update
           try {
-            onConversationCreated?.(data.conversationid);
+            onConversationCreated?.(data.conversationid , data.title || title.substring(0, 40));
+            
           } catch (e) {
             console.error("onConversationCreated failed:", e);
           }
